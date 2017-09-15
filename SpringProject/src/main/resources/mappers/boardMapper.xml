@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BoardMapper">
+	<insert id="insertBoard">
+		insert into board (title,content,writer)
+		values(#{title}, #{content},#{writer})
+	</insert>
+	<delete id="deleteBoard">
+		delete from board where bno = #{bno}
+	</delete>
+	<update id="updateBoard">
+		update board set title=#{title},content=#{content},viewcnt=#{viewcnt}
+		where bno = #{bno}
+	</update>
+	<select id="readBoard" resultType="com.bebe.domain.BoardVO">
+		select*from board where bno = #{bno}
+	</select>
+	<select id="listAll" resultType="com.bebe.domain.BoardVO">
+		select * from board where bno>0 order by bno desc, regdate desc
+	</select>
+	<select id="listpage" resultType="com.bebe.domain.BoardVO">
+		select*from board
+		where bno>0 order by bno desc, regdate desc limit #{page}, 10
+	</select>
+	<select id="listCriteria" resultType="com.bebe.domain.BoardVO">
+		select*from board
+		where bno>0 order by bno desc, regdate desc limit #{startPage}, #{perPageNum}
+	</select>
+	<select id="totalCount" resultType="int">
+		select count(bno) from board where bno>0;
+	</select>
+	<select id="listSearch" resultType="com.bebe.domain.BoardVO">
+		select*from board
+		where bno>0 
+		<include refid="search"></include>
+		order by bno desc, regdate desc 
+		limit #{startPage}, #{perPageNum}
+	</select>
+	<select id="searchTotal" resultType="int">
+		select count(bno) from board where bno>0
+		<include refid="search"></include>
+	</select>
+	<sql id="search">
+		<if test="searchType=='t'.toString()">
+			and title like CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="searchType=='c'.toString()">
+			and content like CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="searchType=='w'.toString()">
+			and writer like CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="searchType=='tc'.toString()">
+			and title like CONCAT('%', #{keyword}, '%') OR
+			content like CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="searchType=='cw'.toString()">
+			and content like CONCAT('%', #{keyword}, '%') OR
+			writer like CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="searchType=='tcw'.toString()">
+			and title like CONCAT('%', #{keyword}, '%') OR
+			content like CONCAT('%', #{keyword}, '%') OR
+			writer like CONCAT('%', #{keyword}, '%')
+		</if>
+	</sql>
+</mapper>
